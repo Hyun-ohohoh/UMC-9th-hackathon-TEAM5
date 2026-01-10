@@ -18,6 +18,11 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object Handler) {
 
+        // CORS preflight 요청(OPTIONS)은 통과시킴
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")){
