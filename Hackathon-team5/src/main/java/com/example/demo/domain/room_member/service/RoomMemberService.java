@@ -237,6 +237,7 @@ public class RoomMemberService {
                 .roomId(room.getId())
                 .room(room)
                 .playingAt(LocalDateTime.now())         // 게임 시작 시간 기록
+                .playtimeSeconds(0)                      // 초기값 0
                 .build();
 
         roomGameService.saveState(gameState);
