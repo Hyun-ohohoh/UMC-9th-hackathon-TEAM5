@@ -33,10 +33,6 @@ public class RoomService {
 
     @Transactional
     public CreateRoomResponseDto createRoom(CreateRoomRequestDto dto, Long userId) {
-
-        if (dto.getPolice_capacity() + dto.getThief_capacity() > dto.getMaxParticipants()){
-            throw new BusinessException(ErrorCode.VALIDATION_ERROR);
-        }
         User user = userService.getUserById(userId);
         Room room = Room.builder()
                 .host(user)
@@ -45,7 +41,6 @@ public class RoomService {
                 .latitude(dto.getLat())
                 .longitude(dto.getLng())
                 .meetingTime(dto.getMeetingTime())
-                .capacityTotal(dto.getMaxParticipants())
                 .capacityPolice(dto.getPolice_capacity())
                 .capacityThief(dto.getThief_capacity())
                 .status(RoomStatus.WAITING)

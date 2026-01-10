@@ -41,12 +41,6 @@ public class CreateRoomRequestDto {
     @Future(message = "만남 시간은 현재 시간 이후여야 합니다.")
     private LocalDateTime meetingTime;
 
-    @Schema(description = "최대 참가자 수", example = "12")
-    @NotNull(message = "최대 참가자 수는 필수입니다.")
-    @Min(value = 2, message = "최소 2명 이상이어야 합니다.")
-    @Max(value = 20, message = "최대 20명까지 가능합니다.")
-    private Integer maxParticipants;
-
     @Schema(description = "모집하는 경찰 수", example = "5")
     @NotNull(message = "모집하는 경찰 수는 필수입니다.")
     @Min(value = 1, message = "최소 1명 이상이어야 합니다.")
