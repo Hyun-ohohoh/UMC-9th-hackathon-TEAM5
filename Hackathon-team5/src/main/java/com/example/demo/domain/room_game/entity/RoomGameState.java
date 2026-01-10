@@ -22,6 +22,9 @@ public class RoomGameState {
     @JoinColumn(name = "room_id")
     private Room room;
 
+    @Column(name = "game_image_url", columnDefinition = "TEXT")
+    private String gameImageUrl;
+
     @Column(name = "playing_at")
     private LocalDateTime playingAt;
 
