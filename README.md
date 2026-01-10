@@ -11,7 +11,10 @@
 - **데이터베이스**: H2 (개발용 인메모리)
 
 ## Server Architecture
-![서버 아키택처](./serverArc.png)
+![서버 아키택처]
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c973d407-618f-4c93-a376-83fee7f41a04" alt="인프라 구조도" width="850">
+</p>
 
 ## 💻 Convention 💻
 
