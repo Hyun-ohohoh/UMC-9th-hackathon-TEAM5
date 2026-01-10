@@ -42,7 +42,8 @@ public enum ErrorCode {
     ROOM_NOT_IN_PLAYING_STATUS(HttpStatus.BAD_REQUEST, "BUSINESS_006", "게임 중인 방에서만 가능한 작업입니다."),
     GAME_NOT_STARTED(HttpStatus.BAD_REQUEST, "BUSINESS_006", "게임이 진행 중일 때만 가능합니다."),
     NOT_A_THIEF(HttpStatus.BAD_REQUEST, "BUSINESS_007", "도둑만 탈옥할 수 있습니다."),
-    NOT_IN_JAIL(HttpStatus.BAD_REQUEST, "BUSINESS_008", "현재 감옥에 갇힌 상태가 아닙니다.");
+    NOT_IN_JAIL(HttpStatus.BAD_REQUEST, "BUSINESS_008", "현재 감옥에 갇힌 상태가 아닙니다."),
+    FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_004", "파일 업로드 중 오류가 발생했습니다."),;
 
 
     // TODO: 비즈니스 로직 개발하면서 필요한 에러코드들 추가

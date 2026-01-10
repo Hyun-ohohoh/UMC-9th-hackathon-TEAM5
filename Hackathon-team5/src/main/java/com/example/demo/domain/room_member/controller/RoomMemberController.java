@@ -10,6 +10,7 @@ import com.example.demo.domain.room_member.dto.response.PhotoUploadResponseDto;
 import com.example.demo.domain.room_member.service.RoomMemberService;
 import com.example.demo.global.config.SwaggerConfig;
 import com.example.demo.global.exception.ErrorCode;
+import com.example.demo.global.infra.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,7 @@ import java.util.List;
 @Tag(name = "Room Member", description = "방 참가자 관련 API")
 public class RoomMemberController {
     private final RoomMemberService roomMemberService;
+    private final S3Service s3Service;
 
     @PatchMapping("/roles")
     @Operation(summary = "팀 배정 및 게임 시작", description = "방장 전용")
@@ -107,7 +109,9 @@ public class RoomMemberController {
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Parameter(description = "사진 파일") @RequestPart MultipartFile photo) {
         // TODO: 구현 필요
-        return ApiResponse.success(new PhotoUploadResponseDto());
+        String imageUrl = s3Service.uploadFile(photo);
+
+        return ApiResponse.success(new PhotoUploadResponseDto(imageUrl));
     }
 
     @PatchMapping("/participants/{userId}/capture")
