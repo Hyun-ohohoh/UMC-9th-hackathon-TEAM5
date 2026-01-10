@@ -63,6 +63,7 @@ public class RoomService {
 
         return CreateRoomResponseDto.builder()
                 .roomId(savedRoom.getId())
+                .hostId(user.getId())
                 .build();
     }
 

@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class CreateRoomResponseDto {
 
     private Long roomId;
+    private Long hostId;
 }
