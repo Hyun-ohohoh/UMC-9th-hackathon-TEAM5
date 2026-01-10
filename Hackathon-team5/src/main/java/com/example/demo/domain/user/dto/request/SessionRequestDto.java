@@ -2,6 +2,7 @@ package com.example.demo.domain.user.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,10 +23,10 @@ public class SessionRequestDto {
     private String password;
 
     @Schema(description = "위도")
-    @NotBlank
-
+    @NotNull(message = "위도는 필수 입력값입니다.")
     private BigDecimal lat;
+
     @Schema(description = "경도")
-    @NotBlank
+    @NotNull(message = "경도는 필수 입력값입니다.")
     private BigDecimal lng;
 }
