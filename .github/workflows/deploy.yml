@@ -30,10 +30,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          # 빌드 경로에도 폴더명 추가
           source: "Hackathon-team5/build/libs/*.jar"
           target: "~/"
-          strip_components: 3 # 경로를 제외하고 파일명만 전송
+          strip_components: 3
 
       # 3. EC2에서 실행
       - name: Deploy to EC2
@@ -45,13 +44,12 @@ jobs:
           script: |
             sudo fuser -k 8080/tcp || true
             JAR_NAME=$(ls -t ~/ | grep .jar | grep -v plain | head -n 1)
-            nohup java -jar \
-              -Dspring.profiles.active=prod \
-              -DRDS_URL="${{ secrets.RDS_URL }}" \
-              -DRDS_USERNAME="${{ secrets.RDS_USERNAME }}" \
-              -DRDS_PASSWORD="${{ secrets.RDS_PASSWORD }}" \
-              -DAWS_ACCESS_KEY="${{ secrets.AWS_ACCESS_KEY }}" \
-              -DAWS_SECRET_KEY="${{ secrets.AWS_SECRET_KEY }}" \
-              -DS3_BUCKET="${{ secrets.S3_BUCKET }}" \
-              -DAWS_REGION="${{ secrets.AWS_REGION }}" \
-              ~/$JAR_NAME > nohup.out 2>&1 &
+            export SPRING_PROFILES_ACTIVE=prod
+            export RDS_URL="${{ secrets.RDS_URL }}"
+            export RDS_USERNAME="${{ secrets.RDS_USERNAME }}"
+            export RDS_PASSWORD="${{ secrets.RDS_PASSWORD }}"
+            export AWS_ACCESS_KEY="${{ secrets.AWS_ACCESS_KEY }}"
+            export AWS_SECRET_KEY="${{ secrets.AWS_SECRET_KEY }}"
+            export S3_BUCKET="${{ secrets.S3_BUCKET }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+            nohup java -jar ~/$JAR_NAME > nohup.out 2>&1 &
