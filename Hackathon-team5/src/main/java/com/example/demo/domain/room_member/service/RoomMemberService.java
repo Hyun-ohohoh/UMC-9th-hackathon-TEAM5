@@ -3,6 +3,8 @@ package com.example.demo.domain.room_member.service;
 import com.example.demo.domain.room.entity.Room;
 import com.example.demo.domain.room.entity.enums.RoomStatus;
 import com.example.demo.domain.room.repository.RoomRepository;
+import com.example.demo.domain.room_member.dto.response.ParticipantResponseDto;
+import com.example.demo.domain.room_member.converter.RoomMemberConverter;
 import com.example.demo.domain.room_member.entity.RoomMember;
 import com.example.demo.domain.room_member.repository.RoomMemberRepository;
 import com.example.demo.global.exception.BusinessException;
@@ -11,12 +13,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RoomMemberService {
 
     private final RoomMemberRepository roomMemberRepository;
+    private final RoomMemberConverter roomMemberConverter;
     private final RoomRepository roomRepository;
 
     @Transactional
@@ -41,5 +46,19 @@ public class RoomMemberService {
 
         // 5. 도착 상태 업데이트
         targetMember.updateToArrived();
+    }
+
+    @Transactional(readOnly = true)
+    public ParticipantResponseDto getParticipantsStatus(Long roomId) {
+        // 1. 해당 방의 모든 참여자 DB에서 최신 상태로 가져옴
+        List<RoomMember> members = roomMemberRepository.findAllByRoom_Id(roomId);
+
+        // 2. 만약 참여자가 한 명도 없다면 방이 존재하지 않거나 비정상적인 접근
+        if (members.isEmpty()) {
+            throw new BusinessException(ErrorCode.ROOM_NOT_FOUND);
+        }
+
+        // 3. 컨버터를 통해 Entity 리스트 DTO로 변환해서 반환
+        return roomMemberConverter.toParticipantResponseDto(roomId, members);
     }
 }
