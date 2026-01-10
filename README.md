@@ -162,8 +162,8 @@ divary-spring/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/
-│   │   │       └── divary/
-│   │   │           ├── DivaryApplication.java          # 메인 애플리케이션 클래스
+│   │   │       └── example/
+│   │   │           ├── DemoApplication.java          # 메인 애플리케이션 클래스
 │   │   │           ├── common/                         # 공통 모듈
 │   │   │           │   ├── entity/                     # 공통 엔티티
 │   │   │           │   │   └── BaseEntity.java         # 기본 엔티티 (ID, 생성일, 수정일)
@@ -243,7 +243,7 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Divary API")
+                        .title("경도팟 API")
                         .description("REST API 문서")
                         .version("v1.0.0"));
     }
@@ -352,7 +352,7 @@ public ApiResponse<PagedResponse<MemberDto>> getMembers(
 ### H2 콘솔 접근
 
 - URL: `http://localhost:8080/h2-console`
-- JDBC URL: `jdbc:h2:mem:divary`
+- JDBC URL: `jdbc:h2:mem:test`
 - Username: `sa`
 - Password: (비어있음)
 
