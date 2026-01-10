@@ -1,6 +1,7 @@
 package com.example.demo.global.config;
 
 import com.example.demo.global.exception.ErrorCode;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.examples.Example;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import lombok.Builder;
 import lombok.Getter;
 import org.springdoc.core.customizers.OperationCustomizer;
@@ -35,14 +37,26 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
+        String jwtSchemeName = "jwtAuth"; // 보안 스키마 이름
 
+        // API 요청 헤더에 Authorization: Bearer <token> 을 추가하기 위한 설정
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
+
+        Components components = new Components()
+                .addSecuritySchemes(jwtSchemeName, new io.swagger.v3.oas.models.security.SecurityScheme()
+                        .name(jwtSchemeName)
+                        .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP) // HTTP 방식
+                        .scheme("bearer")
+                        .bearerFormat("JWT")); // 포맷은 JWT
 
 
         return new OpenAPI()
                 .info(new Info()
                         .title("Adult PlayGroud API")
                         .description("어른들의 놀이터 서비스의 REST API 문서")
-                        .version("v1.0.0"));
+                        .version("v1.0.0"))
+                .addSecurityItem(securityRequirement)
+                .components(components);
     }
 
     @Bean

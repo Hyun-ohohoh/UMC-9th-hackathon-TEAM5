@@ -46,7 +46,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/v1/user/session",
                         "/h2-console/**",
                         "/swagger-ui/**",
-                        "/v3/api-docs/**"
+                        "/swagger-resources/**",
+                        "/api/v1/v3/api-docs/**"
                 );
     }
 
