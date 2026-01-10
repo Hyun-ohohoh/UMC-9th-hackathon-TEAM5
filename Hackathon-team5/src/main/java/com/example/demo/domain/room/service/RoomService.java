@@ -1,30 +1,37 @@
 package com.example.demo.domain.room.service;
 
+import com.example.demo.domain.room.converter.RoomConverter;
 import com.example.demo.domain.room.dto.request.CreateRoomRequestDto;
 import com.example.demo.domain.room.dto.response.CreateRoomResponseDto;
+import com.example.demo.domain.room.dto.response.NearbyRoomDataResponseDto;
+import com.example.demo.domain.room.dto.response.NearbyRoomsResponseDto;
 import com.example.demo.domain.room.entity.Room;
 import com.example.demo.domain.room.entity.enums.RoomStatus;
 import com.example.demo.domain.room.repository.RoomRepository;
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.domain.user.service.UserService;
 import com.example.demo.global.exception.BusinessException;
 import com.example.demo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RoomService {
     private final RoomRepository roomRepository;
     private final UserService userService;
+    private final RoomConverter roomConverter;
 
     public CreateRoomResponseDto createRoom(CreateRoomRequestDto dto, Long userId) {
 
         if (dto.getPolice_capacity() + dto.getThief_capacity() > dto.getMaxParticipants()){
             throw new BusinessException(ErrorCode.VALIDATION_ERROR);
         }
-        User user = userService.findById(userId);
+        User user = userService.getUserById(userId);
         Room room = Room.builder()
                 .host(user)
                 .title(dto.getTitle())
@@ -46,5 +53,31 @@ public class RoomService {
                 .roomId(savedRoom.getId())
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public NearbyRoomsResponseDto getRoomsForUser(Long userId) {
+        // 1. 사용자 정보 조회 (사용자의 현재 위도, 경도 활용)
+        User user = userService.getUserById(userId);
+
+        // 2. 반경 2km(2000m) 고정 조회
+        double FIXED_RADIUS = 3000.0;
+        List<Room> rooms = roomRepository.findRoomsWithinRadius(
+                user.getLongitude().doubleValue(),
+                user.getLatitude().doubleValue(),
+                FIXED_RADIUS
+        );
+
+        // 3. DTO 변환 및 거리 계산
+        List<NearbyRoomDataResponseDto> roomDataList = rooms.stream()
+                .map(room -> roomConverter.convertToDataDto(room, user.getLatitude(), user.getLongitude()))
+                .collect(Collectors.toList());
+
+        return NearbyRoomsResponseDto.builder()
+                .rooms(roomDataList)
+                .totalCount(roomDataList.size())
+                .build();
+    }
+
+
 
 }

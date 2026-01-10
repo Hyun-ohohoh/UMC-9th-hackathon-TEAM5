@@ -16,7 +16,7 @@ import java.util.List;
 public class NearbyRoomsResponseDto {
 
     @Schema(description = "방 목록")
-    private List<NearbyRoomResponseDto> rooms;
+    private List<NearbyRoomDataResponseDto> rooms;
 
     @Schema(description = "전체 방 개수", example = "10")
     private Integer totalCount;

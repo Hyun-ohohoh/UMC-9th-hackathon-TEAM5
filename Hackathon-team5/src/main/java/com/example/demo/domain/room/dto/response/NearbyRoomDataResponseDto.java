@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "주변 방 조회 응답")
-public class NearbyRoomResponseDto {
+public class NearbyRoomDataResponseDto {
 
     @Schema(description = "방 ID", example = "1")
     private Long roomId;
