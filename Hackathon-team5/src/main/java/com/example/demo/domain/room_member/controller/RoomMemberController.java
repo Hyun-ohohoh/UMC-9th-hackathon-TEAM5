@@ -45,7 +45,7 @@ public class RoomMemberController {
             ErrorCode.INVALID_INPUT_VALUE
     })
     public ApiResponse<AssignRolesResponseDto> assignRolesAndStartGame(
-            @AuthUser Long hostUserId,
+            @Parameter(hidden = true)@AuthUser Long hostUserId,
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Valid @RequestBody AssignRolesRequestDto request) {
 
@@ -64,7 +64,7 @@ public class RoomMemberController {
             ErrorCode.USER_NOT_FOUND
     })
     public ApiResponse<JoinRoomResponseDto> joinRoom(
-            @AuthUser Long userId,
+            @Parameter(hidden = true)@AuthUser Long userId,
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Valid @RequestBody JoinRoomRequestDto request) {
 
@@ -79,7 +79,6 @@ public class RoomMemberController {
     })
     public ApiResponse<ParticipantResponseDto> getParticipants(
             @Parameter(description = "방 ID") @PathVariable Long roomId) {
-        // TODO: 구현 필요
         ParticipantResponseDto response = roomMemberService.getParticipantsStatus(roomId);
 
         return ApiResponse.success(response);
@@ -94,7 +93,7 @@ public class RoomMemberController {
             ErrorCode.ROOM_NOT_IN_WAITING_STATUS
     })
     public ApiResponse<Void> updateArrival(
-            @AuthUser Long userId,
+            @Parameter(hidden = true)@AuthUser Long userId,
             @Parameter(description = "방 ID") @PathVariable Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
         Long hostUserId = room.getHost().getId();
@@ -105,26 +104,6 @@ public class RoomMemberController {
         return ApiResponse.success(null);
     }
 
-    @PostMapping(value = "/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "사진 업로드")
-    @SwaggerConfig.ApiErrorExamples({
-            ErrorCode.RESOURCE_NOT_FOUND,
-            ErrorCode.INVALID_INPUT_VALUE
-    })
-    public ApiResponse<PhotoUploadResponseDto> uploadPhoto(
-            @Parameter(description = "방 ID") @PathVariable Long roomId,
-            @Parameter(
-                    description = "사진 파일",
-                    content = @io.swagger.v3.oas.annotations.media.Content(
-                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE
-                    )
-            )
-            @RequestParam("photo") MultipartFile photo) {
-        // TODO: 구현 필요
-        String presignedUrl = s3Service.uploadAndGetPresignedUrl(photo);
-
-        return ApiResponse.success(new PhotoUploadResponseDto(presignedUrl));
-    }
 
     @PatchMapping("/participants/{thiefId}/capture")
     @Operation(summary = "도둑 검거")
@@ -134,7 +113,7 @@ public class RoomMemberController {
             ErrorCode.FORBIDDEN,
             ErrorCode.INVALID_INPUT_VALUE    })
     public ApiResponse<CaptureThiefResponseDto> captureThief(
-            @AuthUser Long currentPoliceId,
+            @Parameter(hidden = true)@AuthUser Long currentPoliceId,
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Parameter(description = "검거한 도둑의 ID") @PathVariable Long thiefId) {
 
@@ -143,7 +122,7 @@ public class RoomMemberController {
         return ApiResponse.success(response);
     }
 
-    @PatchMapping("/participants/{userId}/release")
+    @PatchMapping("/participants/release")
     @Operation(summary = "탈옥", description = "도둑이 본인것만")
     @SwaggerConfig.ApiErrorExamples({
             ErrorCode.RESOURCE_NOT_FOUND,
@@ -154,7 +133,7 @@ public class RoomMemberController {
     })
     public ApiResponse<ReleaseThiefResponseDto> releaseThief(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
-            @Parameter(description = "사용자 ID (본인)") @PathVariable Long userId) {
+            @Parameter(hidden = true)@AuthUser Long userId) {
 
         ReleaseThiefResponseDto response = roomMemberService.releaseThief(roomId, userId);
         return ApiResponse.success(response);
