@@ -4,6 +4,7 @@ import com.example.demo.common.response.ApiResponse;
 import com.example.demo.domain.room.dto.request.CreateRoomRequestDto;
 import com.example.demo.domain.room.dto.response.CreateRoomResponseDto;
 import com.example.demo.domain.room.dto.response.NearbyRoomsResponseDto;
+import com.example.demo.domain.room.dto.response.RoomDetailResponseDto;
 import com.example.demo.domain.room.entity.Room;
 import com.example.demo.domain.room.service.RoomService;
 import com.example.demo.domain.user.entity.User;
@@ -50,5 +51,17 @@ public class RoomController {
         CreateRoomResponseDto responseDto = roomService.createRoom(request, 1L);
 
         return ApiResponse.success(responseDto);
+    }
+
+    @GetMapping("/{roomId}")
+    @Operation(summary = "방 세부정보 조회", description = "방 ID로 방의 세부정보를 조회합니다.")
+    @SwaggerConfig.ApiErrorExamples({
+            ErrorCode.ROOM_NOT_FOUND
+    })
+    public ApiResponse<RoomDetailResponseDto> getRoomDetail(
+            @PathVariable Long roomId) {
+        RoomDetailResponseDto response = roomService.getRoomDetail(roomId);
+
+        return ApiResponse.success(response);
     }
 }

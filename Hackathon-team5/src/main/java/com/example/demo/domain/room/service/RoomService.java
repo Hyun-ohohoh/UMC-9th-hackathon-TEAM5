@@ -5,6 +5,7 @@ import com.example.demo.domain.room.dto.request.CreateRoomRequestDto;
 import com.example.demo.domain.room.dto.response.CreateRoomResponseDto;
 import com.example.demo.domain.room.dto.response.NearbyRoomDataResponseDto;
 import com.example.demo.domain.room.dto.response.NearbyRoomsResponseDto;
+import com.example.demo.domain.room.dto.response.RoomDetailResponseDto;
 import com.example.demo.domain.room.entity.Room;
 import com.example.demo.domain.room.entity.enums.RoomStatus;
 import com.example.demo.domain.room.repository.RoomRepository;
@@ -94,6 +95,17 @@ public class RoomService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    public RoomDetailResponseDto getRoomDetail(Long roomId) {
+        // 1. 방 존재 여부 확인
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
+        // 2. 참가자 목록 조회
+        List<RoomMember> members = roomMemberRepository.findAllByRoomIdWithUser(roomId);
+
+        // 3. 컨버터를 통해 DTO 변환
+        return roomConverter.convertToRoomDetailDto(room, members);
+    }
 
 }
