@@ -71,6 +71,9 @@ public class RoomMember extends BaseEntity {
         this.thiefState = ThiefState.CAUGHT;
         this.caughtByUser = policeUser;
         this.caughtAt = LocalDateTime.now();
+
+    }
+    public void updateCaughtCount(){
         this.caughtCount = this.caughtCount + 1;
     }
 

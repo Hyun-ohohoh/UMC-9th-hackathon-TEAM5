@@ -117,7 +117,7 @@ public class RoomMemberController {
             ErrorCode.ROOM_MEMBER_NOT_FOUND,
             ErrorCode.FORBIDDEN,
             ErrorCode.INVALID_INPUT_VALUE    })
-    public ApiResponse<Long> captureThief(
+    public ApiResponse<?> captureThief(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Parameter(description = "검거한 도둑의 ID") @PathVariable Long userId) {
         // TODO: 구현 필요
@@ -126,10 +126,8 @@ public class RoomMemberController {
         // 1. 검거 로직 실행
         roomMemberService.captureThief(roomId, userId, currentPoliceId);
 
-        // 2. 해당 경찰의 현재 누적 검거 횟수 조회
-        long captureCount = roomMemberService.getPoliceCaptureCount(roomId, currentPoliceId);
 
-        return ApiResponse.success("도둑을 검거했습니다! 현재 검거 횟수: " + captureCount, captureCount);
+        return ApiResponse.success("도둑을 검거했습니다!");
     }
 
     @PatchMapping("/participants/{userId}/release")

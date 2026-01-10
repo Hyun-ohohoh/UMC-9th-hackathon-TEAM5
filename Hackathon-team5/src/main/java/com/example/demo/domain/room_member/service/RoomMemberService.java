@@ -275,19 +275,14 @@ public class RoomMemberService {
 
         // 4. 도둑 상태 업데이트 (검거 처리)
         thief.updateToCaught(police.getUser());
+        police.updateCaughtCount();
     }
 
     /**
      * 경찰이 해당 방에서 도둑을 몇 명 잡았는지 카운트하는 메서드
      */
 
-    public long getPoliceCaptureCount(Long roomId, Long policeUserId) {
-        List<RoomMember> members = roomMemberRepository.findAllByRoom_Id(roomId);
-        return members.stream()
-                .filter(m -> m.getRole() == Role.THIEF)
-                .filter(m -> m.getCaughtByUser() != null && m.getCaughtByUser().getId().equals(policeUserId))
-                .count();
-    }
+
     @Transactional
     public void releaseThief(Long roomId, Long userId) {
         // 해당 유저 존재 확인
