@@ -13,6 +13,7 @@ import com.example.demo.domain.room_member.entity.enums.Role;
 import com.example.demo.domain.room_member.repository.RoomMemberRepository;
 import com.example.demo.global.exception.BusinessException;
 import com.example.demo.global.exception.ErrorCode;
+import com.example.demo.global.websocket.service.WebSocketMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class RoomGameService {
     private final RoomGameStateRepository roomGameStateRepository;
     private final RoomRepository roomRepository;
     private final RoomMemberRepository roomMemberRepository;
+    private final WebSocketMessageService webSocketMessageService;
 
     @Transactional
     public GameStatusResponseDto finishGame(Long roomId, FinishReason finishReason, WinningTeam winningTeam) {
@@ -66,11 +68,16 @@ public class RoomGameService {
                 .collect(Collectors.toList());
 
         // 9. 응답 DTO 생성
-        return GameStatusResponseDto.builder()
+        GameStatusResponseDto response = GameStatusResponseDto.builder()
                 .startTime(gameState.getPlayingAt())
                 .endTime(gameState.getFinishedAt())
                 .participants(participants)
                 .build();
+
+        // 10. WebSocket으로 게임 종료 이벤트 전송
+        webSocketMessageService.sendEventToRoom(roomId, "GAME_FINISHED", response);
+
+        return response;
     }
     @Transactional
     public void saveState(RoomGameState roomGameState) {

@@ -9,8 +9,10 @@ import com.example.demo.domain.room_member.converter.RoomMemberConverter;
 import com.example.demo.domain.room_member.dto.request.AssignRolesRequestDto;
 import com.example.demo.domain.room_member.dto.request.JoinRoomRequestDto;
 import com.example.demo.domain.room_member.dto.response.AssignRolesResponseDto;
+import com.example.demo.domain.room_member.dto.response.CaptureThiefResponseDto;
 import com.example.demo.domain.room_member.dto.response.JoinRoomResponseDto;
 import com.example.demo.domain.room_member.dto.response.ParticipantResponseDto;
+import com.example.demo.domain.room_member.dto.response.ReleaseThiefResponseDto;
 import com.example.demo.domain.room_member.entity.RoomMember;
 import com.example.demo.domain.room_member.entity.enums.JoinStatus;
 import com.example.demo.domain.room_member.entity.enums.Role;
@@ -21,6 +23,7 @@ import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.service.UserService;
 import com.example.demo.global.exception.BusinessException;
 import com.example.demo.global.exception.ErrorCode;
+import com.example.demo.global.websocket.service.WebSocketMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,7 @@ public class RoomMemberService {
     private final RoomMemberConverter roomMemberConverter;
     private final UserService userService;
     private final RoomGameService roomGameService;
+    private final WebSocketMessageService webSocketMessageService;
 
     @Transactional
     public void markAsArrived(Long roomId, Long targetUserId, Long hostUserId) {
@@ -244,7 +248,7 @@ public class RoomMemberService {
     }
 
     @Transactional
-    public void captureThief(Long roomId, Long thiefUserId, Long policeUserId) {
+    public CaptureThiefResponseDto captureThief(Long roomId, Long thiefUserId, Long policeUserId) {
         // 1. 방 존재 및 게임 진행 상태 확인
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
@@ -276,6 +280,27 @@ public class RoomMemberService {
         // 4. 도둑 상태 업데이트 (검거 처리)
         thief.updateToCaught(police.getUser());
         police.updateCaughtCount();
+
+        // 5. 남은 도둑 수 계산
+        List<RoomMember> allThieves = roomMemberRepository.findAllByRoomIdWithUser(roomId).stream()
+                .filter(m -> m.getRole() == Role.THIEF && m.getThiefState() != ThiefState.CAUGHT)
+                .toList();
+        int remainingThieves = allThieves.size();
+
+        // 6. 응답 DTO 생성
+        CaptureThiefResponseDto response = CaptureThiefResponseDto.builder()
+                .thiefUserId(thief.getUser().getId())
+                .thiefNickname(thief.getUser().getNickname())
+                .policeUserId(police.getUser().getId())
+                .policeNickname(police.getUser().getNickname())
+                .remainingThieves(remainingThieves)
+                .message("도둑을 검거했습니다!")
+                .build();
+
+        // 7. WebSocket으로 검거 이벤트 전송
+        webSocketMessageService.sendEventToRoom(roomId, "THIEF_CAPTURED", response);
+
+        return response;
     }
 
     /**
@@ -284,7 +309,7 @@ public class RoomMemberService {
 
 
     @Transactional
-    public void releaseThief(Long roomId, Long userId) {
+    public ReleaseThiefResponseDto releaseThief(Long roomId, Long userId) {
         // 해당 유저 존재 확인
         RoomMember member = roomMemberRepository.findByRoom_IdAndUser_Id(roomId, userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_MEMBER_NOT_FOUND));
@@ -298,7 +323,27 @@ public class RoomMemberService {
             throw new BusinessException(ErrorCode.GAME_NOT_STARTED);
         }
 
+        // 탈옥 처리
         member.release();
+
+        // 남은 도둑 수 계산 (탈옥한 도둑 포함)
+        List<RoomMember> allThieves = roomMemberRepository.findAllByRoomIdWithUser(roomId).stream()
+                .filter(m -> m.getRole() == Role.THIEF && m.getThiefState() != ThiefState.CAUGHT)
+                .toList();
+        int remainingThieves = allThieves.size();
+
+        // 응답 DTO 생성
+        ReleaseThiefResponseDto response = ReleaseThiefResponseDto.builder()
+                .thiefUserId(member.getUser().getId())
+                .thiefNickname(member.getUser().getNickname())
+                .remainingThieves(remainingThieves)
+                .message("탈옥에 성공했습니다!")
+                .build();
+
+        // WebSocket으로 탈옥 이벤트 전송
+        webSocketMessageService.sendEventToRoom(roomId, "ESCAPE_SUCCESS", response);
+
+        return response;
     }
 
 }

@@ -4,9 +4,11 @@ import com.example.demo.common.response.ApiResponse;
 import com.example.demo.domain.room_member.dto.request.AssignRolesRequestDto;
 import com.example.demo.domain.room_member.dto.request.JoinRoomRequestDto;
 import com.example.demo.domain.room_member.dto.response.AssignRolesResponseDto;
+import com.example.demo.domain.room_member.dto.response.CaptureThiefResponseDto;
 import com.example.demo.domain.room_member.dto.response.JoinRoomResponseDto;
 import com.example.demo.domain.room_member.dto.response.ParticipantResponseDto;
 import com.example.demo.domain.room_member.dto.response.PhotoUploadResponseDto;
+import com.example.demo.domain.room_member.dto.response.ReleaseThiefResponseDto;
 import com.example.demo.domain.room_member.service.RoomMemberService;
 import com.example.demo.global.config.SwaggerConfig;
 import com.example.demo.global.exception.ErrorCode;
@@ -117,17 +119,15 @@ public class RoomMemberController {
             ErrorCode.ROOM_MEMBER_NOT_FOUND,
             ErrorCode.FORBIDDEN,
             ErrorCode.INVALID_INPUT_VALUE    })
-    public ApiResponse<?> captureThief(
+    public ApiResponse<CaptureThiefResponseDto> captureThief(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Parameter(description = "검거한 도둑의 ID") @PathVariable Long userId) {
-        // TODO: 구현 필요
-        Long currentPoliceId = 1L;
+        // TODO: 실제 인증 시스템 연동 후 policeUserId를 실제 인증된 사용자 ID로 변경
+        Long currentPoliceId = 1L; // 임시로 1L 사용
 
-        // 1. 검거 로직 실행
-        roomMemberService.captureThief(roomId, userId, currentPoliceId);
+        CaptureThiefResponseDto response = roomMemberService.captureThief(roomId, userId, currentPoliceId);
 
-
-        return ApiResponse.success("도둑을 검거했습니다!");
+        return ApiResponse.success(response);
     }
 
     @PatchMapping("/participants/{userId}/release")
@@ -139,11 +139,11 @@ public class RoomMemberController {
             ErrorCode.NOT_A_THIEF,
             ErrorCode.NOT_IN_JAIL
     })
-    public ApiResponse<Void> releaseThief(
+    public ApiResponse<ReleaseThiefResponseDto> releaseThief(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Parameter(description = "사용자 ID (본인)") @PathVariable Long userId) {
 
-        roomMemberService.releaseThief(roomId, userId);
-        return ApiResponse.success(null);
+        ReleaseThiefResponseDto response = roomMemberService.releaseThief(roomId, userId);
+        return ApiResponse.success(response);
     }
 }
