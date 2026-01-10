@@ -61,4 +61,11 @@ public class RoomMember extends BaseEntity {
     public void assignRole(Role role) {
         this.role = role;
     }
+
+    public void updateToCaught(User policeUser) {
+        this.thiefState = ThiefState.CAUGHT;
+        this.caughtByUser = policeUser;
+        this.caughtAt = LocalDateTime.now();
+    }
 }
+

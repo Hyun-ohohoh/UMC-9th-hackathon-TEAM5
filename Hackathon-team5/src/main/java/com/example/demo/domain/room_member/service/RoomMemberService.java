@@ -13,6 +13,7 @@ import com.example.demo.domain.room_member.entity.RoomMember;
 import com.example.demo.domain.room_member.entity.enums.JoinStatus;
 import com.example.demo.domain.room_member.entity.enums.Role;
 import com.example.demo.domain.room_member.entity.enums.RolePreference;
+import com.example.demo.domain.room_member.entity.enums.ThiefState;
 import com.example.demo.domain.room_member.repository.RoomMemberRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.service.UserService;
@@ -230,4 +231,49 @@ public class RoomMemberService {
         return roomMemberConverter.convertToAssignRolesResponseDto(roomId, allMembers);
     }
 
+    @Transactional
+    public void captureThief(Long roomId, Long thiefUserId, Long policeUserId) {
+        // 1. 방 존재 및 게임 진행 상태 확인
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+        if (room.getStatus() != RoomStatus.PLAYING) {
+            throw new BusinessException(ErrorCode.ROOM_NOT_IN_WAITING_STATUS, "게임이 진행 중인 방에서만 검거가 가능합니다.");
+        }
+
+        // 2. 경찰 확인
+        RoomMember police = roomMemberRepository.findByRoom_IdAndUser_Id(roomId, policeUserId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_MEMBER_NOT_FOUND));
+
+        if (police.getRole() != Role.POLICE) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "경찰만 도둑을 잡을 수 있습니다.");
+        }
+
+        // 3. 도둑 확인
+        RoomMember thief = roomMemberRepository.findByRoom_IdAndUser_Id(roomId, thiefUserId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_MEMBER_NOT_FOUND));
+
+        if (thief.getRole() != Role.THIEF) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "검거 대상이 도둑이 아닙니다.");
+        }
+
+        if (thief.getThiefState() == ThiefState.CAUGHT) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "이미 검거된 도둑입니다.");
+        }
+
+        // 4. 도둑 상태 업데이트 (검거 처리)
+        thief.updateToCaught(police.getUser());
+    }
+
+    /**
+     * 경찰이 해당 방에서 도둑을 몇 명 잡았는지 카운트하는 메서드
+     */
+
+    public long getPoliceCaptureCount(Long roomId, Long policeUserId) {
+        List<RoomMember> members = roomMemberRepository.findAllByRoom_Id(roomId);
+        return members.stream()
+                .filter(m -> m.getRole() == Role.THIEF)
+                .filter(m -> m.getCaughtByUser() != null && m.getCaughtByUser().getId().equals(policeUserId))
+                .count();
+    }
 }
