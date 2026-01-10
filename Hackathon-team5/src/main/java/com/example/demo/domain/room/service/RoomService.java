@@ -8,6 +8,9 @@ import com.example.demo.domain.room.dto.response.NearbyRoomsResponseDto;
 import com.example.demo.domain.room.entity.Room;
 import com.example.demo.domain.room.entity.enums.RoomStatus;
 import com.example.demo.domain.room.repository.RoomRepository;
+import com.example.demo.domain.room_member.entity.RoomMember;
+import com.example.demo.domain.room_member.entity.enums.JoinStatus;
+import com.example.demo.domain.room_member.repository.RoomMemberRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.service.UserService;
 import com.example.demo.global.exception.BusinessException;
@@ -23,9 +26,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RoomService {
     private final RoomRepository roomRepository;
+    private final RoomMemberRepository roomMemberRepository;
     private final UserService userService;
     private final RoomConverter roomConverter;
 
+    @Transactional
     public CreateRoomResponseDto createRoom(CreateRoomRequestDto dto, Long userId) {
 
         if (dto.getPolice_capacity() + dto.getThief_capacity() > dto.getMaxParticipants()){
@@ -48,6 +53,17 @@ public class RoomService {
                 .build();
 
         Room savedRoom = roomRepository.save(room);
+
+        // 방장을 room_members에 자동 추가
+        RoomMember hostMember = RoomMember.builder()
+                .room(savedRoom)
+                .user(user)
+                .joinStatus(JoinStatus.JOINED)
+                .isArrived(false)
+                .build();
+        roomMemberRepository.save(hostMember);
+
+        System.out.println("방 생성 완료 - roomId: " + savedRoom.getId() + ", 방장 userId: " + user.getId());
 
         return CreateRoomResponseDto.builder()
                 .roomId(savedRoom.getId())

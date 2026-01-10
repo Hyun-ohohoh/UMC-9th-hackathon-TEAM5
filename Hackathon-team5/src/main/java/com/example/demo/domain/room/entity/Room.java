@@ -56,4 +56,8 @@ public class Room extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private RoomStatus status = RoomStatus.WAITING;
+
+    public void updateStatus(RoomStatus status) {
+        this.status = status;
+    }
 }

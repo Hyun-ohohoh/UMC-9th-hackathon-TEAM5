@@ -2,7 +2,9 @@ package com.example.demo.domain.room_member.controller;
 
 import com.example.demo.common.response.ApiResponse;
 import com.example.demo.domain.room_member.dto.request.AssignRolesRequestDto;
+import com.example.demo.domain.room_member.dto.request.JoinRoomRequestDto;
 import com.example.demo.domain.room_member.dto.response.AssignRolesResponseDto;
+import com.example.demo.domain.room_member.dto.response.JoinRoomResponseDto;
 import com.example.demo.domain.room_member.dto.response.ParticipantResponseDto;
 import com.example.demo.domain.room_member.dto.response.PhotoUploadResponseDto;
 import com.example.demo.domain.room_member.service.RoomMemberService;
@@ -26,16 +28,41 @@ public class RoomMemberController {
     private final RoomMemberService roomMemberService;
 
     @PatchMapping("/roles")
-    @Operation(summary = "팀 배정", description = "방장 전용 - 마지막에 한번에 보내는 플로우로 생각해봤습니다")
+    @Operation(summary = "팀 배정 및 게임 시작", description = "방장 전용")
     @SwaggerConfig.ApiErrorExamples({
-            ErrorCode.RESOURCE_NOT_FOUND,
-            ErrorCode.FORBIDDEN
+            ErrorCode.ROOM_NOT_FOUND,
+            ErrorCode.ONLY_HOST_ALLOWED,
+            ErrorCode.ROOM_NOT_IN_WAITING_STATUS,
+            ErrorCode.INVALID_INPUT_VALUE
     })
-    public ApiResponse<AssignRolesResponseDto> assignRoles(
+    public ApiResponse<AssignRolesResponseDto> assignRolesAndStartGame(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Valid @RequestBody AssignRolesRequestDto request) {
-        // TODO: 구현 필요
-        return ApiResponse.success(new AssignRolesResponseDto());
+        // TODO: 실제 인증 시스템 연동 후 hostUserId를 실제 인증된 사용자 ID로 변경
+        Long hostUserId = 1L; // 임시로 1L 사용 (인증 구현 후 수정 필요)
+
+        AssignRolesResponseDto response = roomMemberService.assignRolesAndStartGame(roomId, request, hostUserId);
+        return ApiResponse.success(response);
+    }
+
+    @PostMapping("/join")
+    @Operation(summary = "방 참가", description = "방에 참가합니다. 역할군(경찰/도둑/랜덤)을 선택할 수 있습니다.")
+    @SwaggerConfig.ApiErrorExamples({
+            ErrorCode.ROOM_NOT_FOUND,
+            ErrorCode.ROOM_NOT_IN_WAITING_STATUS,
+            ErrorCode.ALREADY_JOINED_ROOM,
+            ErrorCode.ROOM_FULL,
+            ErrorCode.ROLE_CAPACITY_FULL,
+            ErrorCode.USER_NOT_FOUND
+    })
+    public ApiResponse<JoinRoomResponseDto> joinRoom(
+            @Parameter(description = "방 ID") @PathVariable Long roomId,
+            @Valid @RequestBody JoinRoomRequestDto request) {
+        // TODO: 실제 인증 시스템 연동 후 userId를 실제 인증된 사용자 ID로 변경
+        Long userId = 2L; // 임시로 2L 사용 (인증 구현 후 수정 필요)
+
+        JoinRoomResponseDto response = roomMemberService.joinRoom(roomId, userId, request);
+        return ApiResponse.success(response);
     }
 
     @GetMapping("/participants")

@@ -28,12 +28,16 @@ public enum ErrorCode {
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_002", "방을 찾을 수 없습니다."),
     ROOM_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_003", "방 참가자를 찾을 수 없습니다."),
 
+
     // 충돌 오류
     CONCURRENCY_CONFLICT(HttpStatus.CONFLICT, "CONFLICT_001", "요청이 다른 사용자와 충돌했습니다. 페이지를 새로고침 후 다시 시도해주세요."),
     
     // 비즈니스 로직 에러들
     ONLY_HOST_ALLOWED(HttpStatus.FORBIDDEN, "BUSINESS_001", "방장만 접근할 수 있습니다."),
-    ROOM_NOT_IN_WAITING_STATUS(HttpStatus.BAD_REQUEST, "BUSINESS_002", "대기 중인 방에서만 가능한 작업입니다.");
+    ROOM_NOT_IN_WAITING_STATUS(HttpStatus.BAD_REQUEST, "BUSINESS_002", "대기 중인 방에서만 가능한 작업입니다."),
+    ALREADY_JOINED_ROOM(HttpStatus.BAD_REQUEST, "BUSINESS_003", "이미 참가한 방입니다."),
+    ROOM_FULL(HttpStatus.BAD_REQUEST, "BUSINESS_004", "방 정원이 가득 찼습니다."),
+    ROLE_CAPACITY_FULL(HttpStatus.BAD_REQUEST, "BUSINESS_005", "선택한 역할군의 정원이 가득 찼습니다.");
 
 
     // TODO: 비즈니스 로직 개발하면서 필요한 에러코드들 추가
