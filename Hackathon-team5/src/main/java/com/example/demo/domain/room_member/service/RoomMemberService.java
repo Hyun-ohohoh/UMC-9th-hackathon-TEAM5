@@ -233,13 +233,12 @@ public class RoomMemberService {
         room.updateStatus(RoomStatus.PLAYING);
         System.out.println("방 상태 변경: roomId=" + roomId + ", status=PLAYING");
 
+        // 8. 게임 상태 업데이트 (roomId 제거 - @MapsId가 자동 설정)
         RoomGameState gameState = RoomGameState.builder()
-                .roomId(room.getId())
-                .room(room)
-                .playingAt(LocalDateTime.now())         // 게임 시작 시간 기록
-                .playtimeSeconds(0)                      // 초기값 0
+                .room(room)  // roomId는 제거, room만 설정
+                .playingAt(LocalDateTime.now())
+                .playtimeSeconds(0)
                 .build();
-
         roomGameService.saveState(gameState);
 
         // 8. 응답 DTO 생성 및 반환
