@@ -43,10 +43,12 @@ public class RoomMemberController {
     @SwaggerConfig.ApiErrorExamples({
             ErrorCode.RESOURCE_NOT_FOUND
     })
-    public ApiResponse<List<ParticipantResponseDto>> getParticipants(
+    public ApiResponse<ParticipantResponseDto> getParticipants(
             @Parameter(description = "방 ID") @PathVariable Long roomId) {
         // TODO: 구현 필요
-        return ApiResponse.success(List.of());
+        ParticipantResponseDto response = roomMemberService.getParticipantsStatus(roomId);
+
+        return ApiResponse.success(response);
     }
 
     @PatchMapping("/participants/{userId}/arrival")
