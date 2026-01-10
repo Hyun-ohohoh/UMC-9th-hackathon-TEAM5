@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -101,7 +102,7 @@ public class RoomMemberController {
         return ApiResponse.success(null);
     }
 
-    @PostMapping("/photo")
+    @PostMapping(value = "/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "사진 업로드")
     @SwaggerConfig.ApiErrorExamples({
             ErrorCode.RESOURCE_NOT_FOUND,
@@ -109,7 +110,13 @@ public class RoomMemberController {
     })
     public ApiResponse<PhotoUploadResponseDto> uploadPhoto(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
-            @Parameter(description = "사진 파일") @RequestPart MultipartFile photo) {
+            @Parameter(
+                    description = "사진 파일",
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE
+                    )
+            )
+            @RequestParam("photo") MultipartFile photo) {
         // TODO: 구현 필요
         String presignedUrl = s3Service.uploadAndGetPresignedUrl(photo);
 

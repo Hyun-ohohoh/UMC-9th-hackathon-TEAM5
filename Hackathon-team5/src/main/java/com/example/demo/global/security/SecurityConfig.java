@@ -38,6 +38,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/**").permitAll() // 로그인, 회원가입 관련 경로는 모두 허용
+                        .requestMatchers("/h2-console/**").permitAll() // H2 콘솔 접근 허용
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(exceptions -> exceptions
