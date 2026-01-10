@@ -33,7 +33,7 @@ public class Room extends BaseEntity {
     private LocalDateTime escapeTime;
 
     @Column(columnDefinition = "TEXT")
-    private String notice;
+    private String discription;
 
     @Column(name = "capacity_total", nullable = false)
     private Integer capacityTotal;
