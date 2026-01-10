@@ -29,7 +29,8 @@ public class RoomGameState {
     private LocalDateTime playingAt;
 
     @Column(name = "playtime_seconds", nullable = false)
-    private Integer playtimeSeconds;
+    @Builder.Default
+    private Integer playtimeSeconds = 0;
 
     @Column(name = "finished_at")
     private LocalDateTime finishedAt;
@@ -51,6 +52,11 @@ public class RoomGameState {
         }
         this.finishReason = finishReason;
         this.winningTeam = winningTeam;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updatePlayingTime(LocalDateTime playingAt) {
+        this.playingAt = playingAt;
         this.updatedAt = LocalDateTime.now();
     }
 }

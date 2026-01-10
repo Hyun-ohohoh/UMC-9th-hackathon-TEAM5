@@ -84,7 +84,7 @@ public class RoomMemberController {
         return ApiResponse.success(response);
     }
 
-    @PatchMapping("/participants/arrival")
+    @PatchMapping("/participants/{targetUserId}/arrival")
     @Operation(summary = "도착으로 변경", description = "방장 전용 - 대기방에 있는 참여자의 도착 여부를 변경합니다.")
     @SwaggerConfig.ApiErrorExamples({
             ErrorCode.ROOM_NOT_FOUND,
@@ -94,12 +94,16 @@ public class RoomMemberController {
     })
     public ApiResponse<Void> updateArrival(
             @Parameter(hidden = true)@AuthUser Long userId,
+            @Parameter(description = "바꾸려는 user ID") @PathVariable  Long targetUserId,
             @Parameter(description = "방 ID") @PathVariable Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
         Long hostUserId = room.getHost().getId();
 
+        if(!userId.equals(hostUserId)){
+            throw new BusinessException(ErrorCode.ONLY_HOST_ALLOWED);
+        }
 
-        roomMemberService.markAsArrived(roomId, userId, hostUserId);
+        roomMemberService.markAsArrived(roomId, targetUserId, hostUserId);
 
         return ApiResponse.success(null);
     }

@@ -81,6 +81,19 @@ public class RoomGameService {
     }
     @Transactional
     public void saveState(RoomGameState roomGameState) {
-        roomGameStateRepository.save(roomGameState);
+        // 이미 존재하는지 확인
+        if (roomGameStateRepository.existsById(roomGameState.getRoomId())) {
+            // 이미 존재하면 조회해서 업데이트
+            RoomGameState existingState = roomGameStateRepository.findById(roomGameState.getRoomId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.GAME_STATE_NOT_FOUND));
+
+            // 게임 시작 시간이 없으면 업데이트
+            if (existingState.getPlayingAt() == null) {
+                existingState.updatePlayingTime(roomGameState.getPlayingAt());
+            }
+        } else {
+            // 존재하지 않으면 새로 생성
+            roomGameStateRepository.save(roomGameState);
+        }
     }
 }
