@@ -17,10 +17,17 @@ public enum ErrorCode {
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "VALIDATION_001", "입력값 검증에 실패했습니다."),
     REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "VALIDATION_002", "필수 필드가 누락되었습니다."),
 
-    AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH_004", "인증이 필요합니다."),
-    ACCESS_DENIED(HttpStatus.FORBIDDEN, "AUTH_005", "접근이 거절되었습니다."),
-    //충돌 오류
-    CONCURRENCY_CONFLICT(HttpStatus.CONFLICT, "Conflict_001", "요청이 다른 사용자와 충돌했습니다. 페이지를 새로고침 후 다시 시도해주세요.");
+    // 인증/권한 에러들
+    AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH_001", "인증이 필요합니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "AUTH_002", "접근이 거절되었습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_003", "유저를 찾을 수 없습니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "AUTH_004", "권한이 없습니다."),
+
+    // 리소스 에러들
+    RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_001", "요청한 리소스를 찾을 수 없습니다."),
+
+    // 충돌 오류
+    CONCURRENCY_CONFLICT(HttpStatus.CONFLICT, "CONFLICT_001", "요청이 다른 사용자와 충돌했습니다. 페이지를 새로고침 후 다시 시도해주세요.");
 
 
 
