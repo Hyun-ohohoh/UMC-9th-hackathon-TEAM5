@@ -35,9 +35,6 @@ public class Room extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String discription;
 
-    @Column(name = "capacity_total", nullable = false)
-    private Integer capacityTotal;
-
     @Column(name = "capacity_police", nullable = false)
     private Integer capacityPolice;
 
@@ -59,5 +56,9 @@ public class Room extends BaseEntity {
 
     public void updateStatus(RoomStatus status) {
         this.status = status;
+    }
+
+    public Integer getCapacityTotal() {
+        return this.capacityPolice + this.capacityThief;
     }
 }
