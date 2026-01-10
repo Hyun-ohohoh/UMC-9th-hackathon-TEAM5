@@ -13,7 +13,6 @@ import com.example.demo.domain.room_member.entity.RoomMember;
 import com.example.demo.domain.room_member.entity.enums.JoinStatus;
 import com.example.demo.domain.room_member.entity.enums.Role;
 import com.example.demo.domain.room_member.entity.enums.RolePreference;
-import com.example.demo.domain.room_member.entity.enums.ThiefState;
 import com.example.demo.domain.room_member.repository.RoomMemberRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.service.UserService;
@@ -276,4 +275,22 @@ public class RoomMemberService {
                 .filter(m -> m.getCaughtByUser() != null && m.getCaughtByUser().getId().equals(policeUserId))
                 .count();
     }
+    @Transactional
+    public void releaseThief(Long roomId, Long userId) {
+        // 해당 유저 존재 확인
+        RoomMember member = roomMemberRepository.findByRoom_IdAndUser_Id(roomId, userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_MEMBER_NOT_FOUND));
+
+        // 방 존재 여부 확인
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+        // 게임 상태 확인
+        if(room.getStatus() != RoomStatus.PLAYING) {
+            throw new BusinessException(ErrorCode.GAME_NOT_STARTED);
+        }
+
+        member.release();
+    }
+
 }

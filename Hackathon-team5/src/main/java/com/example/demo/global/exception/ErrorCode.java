@@ -37,7 +37,10 @@ public enum ErrorCode {
     ROOM_NOT_IN_WAITING_STATUS(HttpStatus.BAD_REQUEST, "BUSINESS_002", "대기 중인 방에서만 가능한 작업입니다."),
     ALREADY_JOINED_ROOM(HttpStatus.BAD_REQUEST, "BUSINESS_003", "이미 참가한 방입니다."),
     ROOM_FULL(HttpStatus.BAD_REQUEST, "BUSINESS_004", "방 정원이 가득 찼습니다."),
-    ROLE_CAPACITY_FULL(HttpStatus.BAD_REQUEST, "BUSINESS_005", "선택한 역할군의 정원이 가득 찼습니다.");
+    ROLE_CAPACITY_FULL(HttpStatus.BAD_REQUEST, "BUSINESS_005", "선택한 역할군의 정원이 가득 찼습니다."),
+    GAME_NOT_STARTED(HttpStatus.BAD_REQUEST, "BUSINESS_006", "게임이 진행 중일 때만 가능합니다."),
+    NOT_A_THIEF(HttpStatus.BAD_REQUEST, "BUSINESS_007", "도둑만 탈옥할 수 있습니다."),
+    NOT_IN_JAIL(HttpStatus.BAD_REQUEST, "BUSINESS_008", "현재 감옥에 갇힌 상태가 아닙니다.");
 
 
     // TODO: 비즈니스 로직 개발하면서 필요한 에러코드들 추가

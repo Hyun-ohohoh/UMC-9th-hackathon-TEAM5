@@ -67,5 +67,25 @@ public class RoomMember extends BaseEntity {
         this.caughtByUser = policeUser;
         this.caughtAt = LocalDateTime.now();
     }
+
+    public void release() {
+        // 도둑인지 확인
+        if(this.role != Role.THIEF) {
+            throw new BusinessException(ErrorCode.NOT_A_THIEF);
+        }
+
+        // 검거 상태인지 확인
+        if(this.thiefState != ThiefState.CAUGHT) {
+            throw new BusinessException(ErrorCode.NOT_IN_JAIL);
+        }
+
+        // 상태 변경
+        this.thiefState = ThiefState.ALIVE;
+
+        // 정보 업데이트
+        this.caughtByUser = null;
+        this.caughtAt = null;
+
+    }
 }
 

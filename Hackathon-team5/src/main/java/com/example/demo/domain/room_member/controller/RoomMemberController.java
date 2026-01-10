@@ -132,16 +132,20 @@ public class RoomMemberController {
         return ApiResponse.success("도둑을 검거했습니다! 현재 검거 횟수: " + captureCount, captureCount);
     }
 
-    @PatchMapping("/participants/{userId}/release")
+    @PatchMapping("/{roomId}/participants/{userId}/release")
     @Operation(summary = "탈옥", description = "도둑이 본인것만")
     @SwaggerConfig.ApiErrorExamples({
             ErrorCode.RESOURCE_NOT_FOUND,
-            ErrorCode.FORBIDDEN
+            ErrorCode.FORBIDDEN,
+            ErrorCode.GAME_NOT_STARTED,
+            ErrorCode.NOT_A_THIEF,
+            ErrorCode.NOT_IN_JAIL
     })
     public ApiResponse<Void> releaseThief(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Parameter(description = "사용자 ID (본인)") @PathVariable Long userId) {
-        // TODO: 구현 필요
+
+        roomMemberService.releaseThief(roomId, userId);
         return ApiResponse.success(null);
     }
 }
