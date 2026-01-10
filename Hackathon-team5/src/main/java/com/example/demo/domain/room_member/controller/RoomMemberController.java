@@ -26,12 +26,12 @@ public class RoomMemberController {
     private final RoomMemberService roomMemberService;
 
     @PatchMapping("/roles")
-    @Operation(summary = "팀 배정", description = "방장 전용 - 마지막에 한번에 보내는 플로우로 생각해봤습니다")
+    @Operation(summary = "팀 배정 및 게임 시작", description = "방장 전용")
     @SwaggerConfig.ApiErrorExamples({
-            ErrorCode.RESOURCE_NOT_FOUND,
+            ErrorCode.ROOM_NOT_FOUND,
             ErrorCode.FORBIDDEN
     })
-    public ApiResponse<AssignRolesResponseDto> assignRoles(
+    public ApiResponse<AssignRolesResponseDto> assignRolesAndStartGame(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
             @Valid @RequestBody AssignRolesRequestDto request) {
         // TODO: 구현 필요
