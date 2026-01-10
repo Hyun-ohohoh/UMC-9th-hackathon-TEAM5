@@ -11,6 +11,7 @@ import com.example.demo.global.config.SwaggerConfig;
 import com.example.demo.global.exception.ErrorCode;
 import com.example.demo.global.security.annotation.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class RoomController {
             ErrorCode.USER_NOT_FOUND
     })
     public ApiResponse<NearbyRoomsResponseDto> getNearbyRooms(
-            @AuthUser Long userId
+            @Parameter(hidden = true)@AuthUser Long userId
     ) {
 
         NearbyRoomsResponseDto response = roomService.getRoomsForUser(userId);
@@ -47,7 +48,7 @@ public class RoomController {
             ErrorCode.USER_NOT_FOUND
     })
     public ApiResponse<CreateRoomResponseDto> createRoom(
-            @AuthUser Long userId,
+            @Parameter(hidden = true)@AuthUser Long userId,
             @Valid @RequestBody CreateRoomRequestDto request) {
         CreateRoomResponseDto responseDto = roomService.createRoom(request, userId);
 
