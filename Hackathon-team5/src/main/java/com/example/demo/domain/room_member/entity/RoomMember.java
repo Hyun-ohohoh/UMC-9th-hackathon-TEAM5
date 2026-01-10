@@ -44,4 +44,13 @@ public class RoomMember extends BaseEntity {
 
     @Column(name = "caught_at")
     private LocalDateTime caughtAt;
+
+    @Column(name = "is_arrived", nullable = false)
+    @Builder.Default
+    private Boolean isArrived = false;
+
+    public void updateToArrived() {
+        // JoinStatus를 VERIFIED(도착 완료)로 변경
+        this.joinStatus = com.example.demo.domain.room_member.entity.enums.JoinStatus.VERIFIED;
+    }
 }

@@ -5,6 +5,7 @@ import com.example.demo.domain.room_member.dto.request.AssignRolesRequestDto;
 import com.example.demo.domain.room_member.dto.response.AssignRolesResponseDto;
 import com.example.demo.domain.room_member.dto.response.ParticipantResponseDto;
 import com.example.demo.domain.room_member.dto.response.PhotoUploadResponseDto;
+import com.example.demo.domain.room_member.service.RoomMemberService;
 import com.example.demo.global.config.SwaggerConfig;
 import com.example.demo.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Room Member", description = "방 참가자 관련 API")
 public class RoomMemberController {
+    private final RoomMemberService roomMemberService;
 
     @PatchMapping("/roles")
     @Operation(summary = "팀 배정", description = "방장 전용 - 마지막에 한번에 보내는 플로우로 생각해봤습니다")
@@ -48,15 +50,21 @@ public class RoomMemberController {
     }
 
     @PatchMapping("/participants/{userId}/arrival")
-    @Operation(summary = "도착으로 변경", description = "방장 전용")
+    @Operation(summary = "도착으로 변경", description = "방장 전용 - 대기방에 있는 참여자의 도착 여부를 변경합니다.")
     @SwaggerConfig.ApiErrorExamples({
-            ErrorCode.RESOURCE_NOT_FOUND,
-            ErrorCode.FORBIDDEN
+            ErrorCode.ROOM_NOT_FOUND,
+            ErrorCode.ROOM_MEMBER_NOT_FOUND,
+            ErrorCode.ONLY_HOST_ALLOWED,
+            ErrorCode.ROOM_NOT_IN_WAITING_STATUS
     })
     public ApiResponse<Void> updateArrival(
             @Parameter(description = "방 ID") @PathVariable Long roomId,
-            @Parameter(description = "사용자 ID") @PathVariable Long userId) {
-        // TODO: 구현 필요
+            @Parameter(description = "도착으로 변경할 참가자의 사용자 ID") @PathVariable Long userId) {
+        // TODO: 실제 인증 시스템 연동 후 hostUserId를 실제 인증된 사용자 ID로 변경
+        Long hostUserId = 1L; // 임시로 1L 사용 (인증 구현 후 수정 필요)
+        
+        roomMemberService.markAsArrived(roomId, userId, hostUserId);
+        
         return ApiResponse.success(null);
     }
 
@@ -74,7 +82,7 @@ public class RoomMemberController {
     }
 
     @PatchMapping("/participants/{userId}/capture")
-    @Operation(summary = "도독 검거")
+    @Operation(summary = "도둑 검거")
     @SwaggerConfig.ApiErrorExamples({
             ErrorCode.RESOURCE_NOT_FOUND
     })
@@ -86,7 +94,7 @@ public class RoomMemberController {
     }
 
     @PatchMapping("/participants/{userId}/release")
-    @Operation(summary = "탈옥", description = "도독이 본인것만")
+    @Operation(summary = "탈옥", description = "도둑이 본인것만")
     @SwaggerConfig.ApiErrorExamples({
             ErrorCode.RESOURCE_NOT_FOUND,
             ErrorCode.FORBIDDEN

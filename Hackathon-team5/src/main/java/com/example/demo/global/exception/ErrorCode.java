@@ -25,10 +25,15 @@ public enum ErrorCode {
 
     // 리소스 에러들
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_001", "요청한 리소스를 찾을 수 없습니다."),
+    ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_002", "방을 찾을 수 없습니다."),
+    ROOM_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_003", "방 참가자를 찾을 수 없습니다."),
 
     // 충돌 오류
-    CONCURRENCY_CONFLICT(HttpStatus.CONFLICT, "CONFLICT_001", "요청이 다른 사용자와 충돌했습니다. 페이지를 새로고침 후 다시 시도해주세요.");
-
+    CONCURRENCY_CONFLICT(HttpStatus.CONFLICT, "CONFLICT_001", "요청이 다른 사용자와 충돌했습니다. 페이지를 새로고침 후 다시 시도해주세요."),
+    
+    // 비즈니스 로직 에러들
+    ONLY_HOST_ALLOWED(HttpStatus.FORBIDDEN, "BUSINESS_001", "방장만 접근할 수 있습니다."),
+    ROOM_NOT_IN_WAITING_STATUS(HttpStatus.BAD_REQUEST, "BUSINESS_002", "대기 중인 방에서만 가능한 작업입니다.");
 
 
     // TODO: 비즈니스 로직 개발하면서 필요한 에러코드들 추가
