@@ -8,6 +8,7 @@ import com.example.demo.domain.room_member.dto.request.JoinRoomRequestDto;
 import com.example.demo.domain.room_member.dto.response.AssignRolesResponseDto;
 import com.example.demo.domain.room_member.dto.response.CaptureThiefResponseDto;
 import com.example.demo.domain.room_member.dto.response.JoinRoomResponseDto;
+import com.example.demo.domain.room_member.dto.response.LeaveRoomResponseDto;
 import com.example.demo.domain.room_member.dto.response.ParticipantResponseDto;
 import com.example.demo.domain.room_member.dto.response.PhotoUploadResponseDto;
 import com.example.demo.domain.room_member.dto.response.ReleaseThiefResponseDto;
@@ -69,6 +70,21 @@ public class RoomMemberController {
             @Valid @RequestBody JoinRoomRequestDto request) {
 
         JoinRoomResponseDto response = roomMemberService.joinRoom(roomId, userId, request);
+        return ApiResponse.success(response);
+    }
+
+    @DeleteMapping("/leave")
+    @Operation(summary = "방 나가기", description = "방에서 나갑니다. 방장이 나가면 다른 참가자에게 방장이 위임됩니다. 참가자가 없으면 방이 삭제됩니다.")
+    @SwaggerConfig.ApiErrorExamples({
+            ErrorCode.ROOM_NOT_FOUND,
+            ErrorCode.ROOM_NOT_IN_WAITING_STATUS,
+            ErrorCode.NOT_JOINED_ROOM
+    })
+    public ApiResponse<LeaveRoomResponseDto> leaveRoom(
+            @Parameter(hidden = true) @AuthUser Long userId,
+            @Parameter(description = "방 ID") @PathVariable Long roomId) {
+
+        LeaveRoomResponseDto response = roomMemberService.leaveRoom(roomId, userId);
         return ApiResponse.success(response);
     }
 
