@@ -58,6 +58,10 @@ public class Room extends BaseEntity {
         this.status = status;
     }
 
+    public void updateHost(User newHost) {
+        this.host = newHost;
+    }
+
     public Integer getCapacityTotal() {
         return this.capacityPolice + this.capacityThief;
     }

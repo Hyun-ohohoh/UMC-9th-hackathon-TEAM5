@@ -51,6 +51,8 @@ public class RoomConverter {
                 .meetingTime(room.getMeetingTime())
                 .status(room.getStatus().name())
                 .countdownSeconds(room.getCountdownSeconds())
+                .escapeTime(room.getEscapeTime())
+                .description(room.getDiscription())
                 .capacity(capacity)
                 .participants(participants)
                 .build();

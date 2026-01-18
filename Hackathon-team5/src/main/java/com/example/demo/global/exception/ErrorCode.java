@@ -50,6 +50,8 @@ public enum ErrorCode {
     GAME_NOT_STARTED(HttpStatus.BAD_REQUEST, "BUSINESS_006", "게임이 진행 중일 때만 가능합니다."),
     NOT_A_THIEF(HttpStatus.BAD_REQUEST, "BUSINESS_007", "도둑만 탈옥할 수 있습니다."),
     NOT_IN_JAIL(HttpStatus.BAD_REQUEST, "BUSINESS_008", "현재 감옥에 갇힌 상태가 아닙니다."),
+    HOST_CANNOT_LEAVE(HttpStatus.BAD_REQUEST, "BUSINESS_009", "방장은 방을 나갈 수 없습니다."),
+    NOT_JOINED_ROOM(HttpStatus.BAD_REQUEST, "BUSINESS_010", "참가하지 않은 방입니다."),
     FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_004", "파일 업로드 중 오류가 발생했습니다."),;
 
 

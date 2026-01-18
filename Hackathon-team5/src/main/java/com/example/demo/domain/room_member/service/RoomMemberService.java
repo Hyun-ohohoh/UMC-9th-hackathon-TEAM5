@@ -11,6 +11,7 @@ import com.example.demo.domain.room_member.dto.request.JoinRoomRequestDto;
 import com.example.demo.domain.room_member.dto.response.AssignRolesResponseDto;
 import com.example.demo.domain.room_member.dto.response.CaptureThiefResponseDto;
 import com.example.demo.domain.room_member.dto.response.JoinRoomResponseDto;
+import com.example.demo.domain.room_member.dto.response.LeaveRoomResponseDto;
 import com.example.demo.domain.room_member.dto.response.ParticipantResponseDto;
 import com.example.demo.domain.room_member.dto.response.ReleaseThiefResponseDto;
 import com.example.demo.domain.room_member.entity.RoomMember;
@@ -344,6 +345,52 @@ public class RoomMemberService {
         webSocketMessageService.sendEventToRoom(roomId, "ESCAPE_SUCCESS", response);
 
         return response;
+    }
+
+    @Transactional
+    public LeaveRoomResponseDto leaveRoom(Long roomId, Long userId) {
+        // 1. 방 존재 여부 확인
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+        // 2. 방 상태 확인: WAITING 상태일 때만 나가기 가능
+        if (room.getStatus() != RoomStatus.WAITING) {
+            throw new BusinessException(ErrorCode.ROOM_NOT_IN_WAITING_STATUS);
+        }
+
+        // 3. 참가자 존재 확인
+        RoomMember member = roomMemberRepository.findByRoom_IdAndUser_Id(roomId, userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_JOINED_ROOM));
+
+        // 4. 방장인지 확인
+        boolean isHost = room.getHost().getId().equals(userId);
+
+        if (isHost) {
+            // 방장인 경우: 다른 참가자에게 방장 위임
+            List<RoomMember> otherMembers = roomMemberRepository.findAllByRoom_Id(roomId).stream()
+                    .filter(m -> !m.getUser().getId().equals(userId))
+                    .toList();
+
+            if (otherMembers.isEmpty()) {
+                // 다른 참가자가 없으면 방 삭제
+                roomMemberRepository.delete(member);
+                roomRepository.delete(room);
+            } else {
+                // 다른 참가자 중 첫 번째 사람에게 방장 위임
+                User newHost = otherMembers.get(0).getUser();
+                room.updateHost(newHost);
+                roomMemberRepository.delete(member);
+            }
+        } else {
+            // 일반 참가자인 경우: 그냥 나가기
+            roomMemberRepository.delete(member);
+        }
+
+        return LeaveRoomResponseDto.builder()
+                .roomId(roomId)
+                .userId(userId)
+                .message("방에서 나갔습니다.")
+                .build();
     }
 
 }

@@ -34,6 +34,12 @@ public class RoomDetailResponseDto {
     @Schema(description = "게임 카운트다운(초)", example = "1800")
     private Integer countdownSeconds;
 
+    @Schema(description = "도망가는 시간(초)", example = "60")
+    private Integer escapeTime;
+
+    @Schema(description = "방 설명", example = "홍대에서 도둑잡기 게임합니다!")
+    private String description;
+
     @Schema(description = "정원 정보")
     private CapacityInfo capacity;
 
